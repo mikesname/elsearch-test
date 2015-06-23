@@ -1,0 +1,9 @@
+# virtualenv
+bin
+lib
+local
+share
+include
+
+*.sqlite3
+*.pyc

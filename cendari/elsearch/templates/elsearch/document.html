@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block css %}
+    <style type="text/css">
+.value {
+    font-family: monospace;
+    background: #EEE;
+}
+
+.CodeMirror {border: 1px solid black; font-size:13px}
+     </style>
+    <link rel="stylesheet" href="{% static "cm/codemirror.css" %}">
+{% endblock %}
+
+{% block js %}
+<script src="{% static "cm/codemirror.js" %}"></script>
+<script src="{% static "cm/xml.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+<form method="get" action="{% url 'document_list' %}">
+  <p>
+    <label for="id_q">search:</label><input id="id_q" name="q" type="text" />
+    <input type="submit" value="search">
+  </p>
+</form>
+
+    <h2>XML Document (<a href="FIXME">Download</a>)</p>
+</h2>
+    <hr/>
+
+    <table>
+      <tr>
+	<td><label>filename:</label></td>
+	<td><span class="value">{{ document.filename }}</span></td>
+      </tr>
+      <tr>
+	<td><label>creator:</label></td>
+	<td><span class="value">{{ document.creator }}</span></td>
+      </tr>
+      <tr>
+	<td><label>created:</label></td>
+	<td><span class="value">{{ document.created }}</span></td>
+      </tr>
+      </table>
+
+<script>
+      var editor = CodeMirror.fromTextArea(
+	  document.getElementById("document"),
+	  { mode: "xml", readOnly: true });
+</script>
+{% endblock %}

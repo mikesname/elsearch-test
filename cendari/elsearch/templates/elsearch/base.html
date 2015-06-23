@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    {% load staticfiles %}
+
+    <title>Cendari Facetted Search</title>
+    <link rel="shortcut icon" href="/favicon.ico?v=2"/>
+    <style type="text/css" href="{% static "css/base.css" %}"></style>
+    {% block css %}{% endblock %}
+    {% block js %}{% endblock %}
+  </head>
+  {% load display %}
+  
+  <body>
+      <H1><a href="{% url "index" %}"><img src="{%static "img/cendari_logo.png" %}"alt="Cendari logo"/></a>Cendari Faceted Search</h1>
+    {% block content %}{% endblock %}
+  </body>
+</html>
