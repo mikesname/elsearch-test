@@ -1,6 +1,8 @@
 
 from django.core.urlresolvers import reverse
 
+from pyelasticsearch import ElasticSearch
+
 class Document(object):
     """A document, indexed in Elasticsearch"""
 
@@ -35,7 +37,10 @@ class DocumentManager(object):
     ]
 
     @classmethod
-    def find_all(self, query = ""):
+    def find_all(self, query = "*", start=0, size=20):
+        es = ElasticSearch()
+        res = es.search(query, index="xmlfacets", es_from=start, size=size)
+        print("Result: %s" % res)
         return [d for d in self.test_docs if query in d.name]
 
     @classmethod

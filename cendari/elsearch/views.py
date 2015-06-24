@@ -5,8 +5,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from models import Document, DocumentManager
 
 def document_list(request):
+    query = request.GET.get("q")
     page = request.GET.get("page")
-    paginator = Paginator(DocumentManager.find_all(), per_page = 20)
+    paginator = Paginator(DocumentManager.find_all("*" if query is None else query), per_page = 20)
     try:
         docs = paginator.page(page)
     except PageNotAnInteger:
