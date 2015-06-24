@@ -131,7 +131,7 @@
   <ol>
     {% for result in page.object_list %}
     <li>
-      <a href="{{ result.get_absolute_url }}">{{ result.filename }}</a>
+      <a href="{% url "document" result.id %}">{{ result.id }}</a>
       <div>
           {{ result.text }}
       </div>
