@@ -26,6 +26,7 @@ TEMPLATE_DEBUG = True
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
+    'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',
 )
 
@@ -43,7 +44,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'elsearch'
+    'elsearch',
 )
 
 MIDDLEWARE_CLASSES = (

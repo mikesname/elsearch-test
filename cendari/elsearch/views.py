@@ -53,10 +53,10 @@ def parse_facets(request, data):
         applied = []
         terms =  fdata.get("terms")
         if terms:
-            inreq = request.GET.get(fclass.param)
+            inreq = request.GET.getlist(fclass.param)
             if inreq:
                 for value in terms:
-                    if value["term"] == inreq:
+                    if value["term"] in inreq:
                         applied.append(value["term"])
         facets.append((fclass, terms, applied))
     return facets
@@ -91,7 +91,7 @@ def search(request):
     except EmptyPage:
         docs = paginator.page(paginator.num_pages)
     context = dict(page=docs)
-    return render(request, "elsearch/document_list.html", dict(page=docs, form=SearchForm(), facets=facets))
+    return render(request, "elsearch/document_list.html", dict(page=docs, form=form, facets=facets))
 
 
 def document(request, doc_id):

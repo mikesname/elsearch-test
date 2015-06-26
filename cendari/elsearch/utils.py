@@ -58,6 +58,24 @@ def country_choices(lang=None):
     for code, name in data.COUNTRY_CODES:
         yield (code, country_name_from_code(code, locale=lang) or name) 
 
+def pagination_range(page, lastpage, adjacents):
+    """Calculate a set of page ranges for windows pagination"""
+    window = adjacents * 2
+    if lastpage <= 1:
+        return []
+    elif lastpage < 7 + window:
+        return [range(1, lastpage + 1)]
+    elif lastpage > 5 + window and page < 1 + window:
+        return [range(1, 4 + window), range(lastpage - 1, lastpage)]
+    elif lastpage - window > page and page > window:
+        return [
+                range(1, 3),
+                range(page - adjacents, page + adjacents + 1),
+                range(lastpage - 1, lastpage + 1)
+                ]
+    else:
+        return [range(1, 3), range(lastpage - (2 + window), lastpage + 1)]
+
 class SearchPaginator(Paginator):    
     def __init__(self, hits):
         self.hits = hits
@@ -71,6 +89,10 @@ class SearchPaginator(Paginator):
             return div if rem == 0 else div + 1
         else:
             return 0
+
+    @property
+    def count(self):
+        return self.hits.total
 
     @property
     def page_range(self):
