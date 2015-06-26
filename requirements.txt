@@ -2,3 +2,4 @@ Django==1.6.11
 pyelasticsearch==1.4
 ckanclient
 elasticsearch-dsl==0.0.4
+babel==1.3

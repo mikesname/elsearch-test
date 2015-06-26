@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load staticfiles %}
+{% load facet_tags %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
@@ -35,6 +36,10 @@
   }
   .searchresult {
     margin-bottom: .75em;
+  }
+
+  .facetclass {
+    list-style: none;
   }
 </style>
 {% endblock %}
@@ -80,35 +85,29 @@
 <div class="leftpanel facetpane">
   <h2>Facets (<a href="?q=">reset</a>)</h2>
   <hr>
-  {% for facet, values in facets.fields.items %}
-  <table id="facetview_{{facet}}" class="facetview_filters table table-bordered table-condensed table-striped" >
-    <tr><td>
+  {% for fclass, values, applied in facets %}
     {% if values %}
-     <a class="facetview_filtershow" title="filter by {{ facet}}" rel="{{facet }}" style="color:#333; font-weight:bold;" href=""><i class="icon-plus"></i> {{ facet|capfirst }} ({{ values|length }})</a>
-    {% else %}
-     <a class="facetview_filtershow facetview_novalues" title="filter by {{ facet}}" rel="{{facet }}" style="color:#999; font-weight:bold;" href=""><i class="icon-plus"></i> {{ facet|capfirst }}</a>
+        <ul class="facetclass">
+            {% for value in values %}
+                <li class="facetvalue">
+                {% with fclass|facet_param:value.term as param %}
+                {% if value.term in applied %}
+                    <input type="hidden" name="{{fclass.param}}" value="{{value.term}}"/>
+                     <span class="selected-filter">
+                    {{fclass|facet_render:value.term}}<a class="remove-filter"
+                        href="{{request.path|removeparam:param|stripparam:"page,sort"}}">
+                            <i class="icon-remove"></i>
+                        </a>
+                    </span>
+                {% else %}
+                     <a href="{{request.path|addparam:param|stripparam:"page,sort"}}">{{fclass|facet_render:value.term}}</a>
+                 {% endif %}
+                
+                {% endwith %}
+                </li>
+            {% endfor %}
+        </ul>
     {% endif %}
-        <div class="btn-group facetview_filteroptions" style="display:none; margin-top:5px;">
-          <a class="btn btn-small facetview_learnmore" title="click to view search help information" href="#"><b>?</b></a> 
-          <a class="btn btn-small facetview_morefacetvals" title="filter list size" rel="{{facet}}" href="{{facet}}">100</a>
-          <a class="btn btn-small facetview_sort {{facet}}" title="filter value order" href="{{facet}}">Sort</a>
-          <a class="btn btn-small facetview_or" title="select another option from this filter" rel="AND" href="{{ facet }}" style="color:#aaa;">OR</a>
-	</div>
-    </td></tr>
-    {% for value in values %}
-    <tr class="facetview_filtervalue" style="display:none;">
-      <td><a class="facetview_filterchoice" rel="{{ facet }}" href="{{ request.get_full_path }}&amp;selected_facets={{ facet }}_exact:{{ value.0|urlencode }}">{{ value.0 }} ({{ value.1 }})</a></td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% comment %}
-  <dl>
-    <dt>{{ facet|capfirst }}</dd>
-    {% for value in values %}
-    <dd><a href="{{ request.get_full_path }}&amp;selected_facets={{ facet }}_exact:{{ value.0|urlencode }}">{{ value.0 }}</a> ({{ value.1 }})</dd>
-    {% endfor %}
-  </dl>
-  {% endcomment %}
   {% endfor %}
 </div>
 
