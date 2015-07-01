@@ -23,6 +23,19 @@ class FacetClass(object):
     def format_param(self, value):
         return "%s=%s" % (self.param, value)
 
+class Facet(object):
+    def __init__(self, value, count, applied, fclass):
+        self.value = value
+        self.count = count
+        self.applied = applied
+        self.fclass = fclass
+
+    def as_param_kv(self):
+        return "%s=%s" % (self.fclass.param, self.value)
+
+    def render(self):
+        return self.fclass.render(self.value)
+
 FACETS = [
     FacetClass("lang", "languages", language_name_from_code)
 ]
@@ -50,15 +63,12 @@ def parse_facets(request, data):
         fdata = getattr(data, fclass.tag)
         if not fdata:            
             continue
-        applied = []
         terms =  fdata.get("terms")
         if terms:
             inreq = request.GET.getlist(fclass.param)
-            if inreq:
-                for value in terms:
-                    if value["term"] in inreq:
-                        applied.append(value["term"])
-        facets.append((fclass, terms, applied))
+            parsed_facets = [Facet(value["term"], value["count"], value["term"] in inreq, fclass)\
+                    for value in terms]
+            facets.append((fclass, parsed_facets))
     return facets
 
 

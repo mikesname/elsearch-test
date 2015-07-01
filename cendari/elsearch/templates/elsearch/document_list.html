@@ -83,30 +83,27 @@ var showfiltervals = function(event) {
     <div style="clear:both;" class="btn-toolbar" id="facetview_selectedfilters">
     </div>
     <div class="leftpanel facetpane">
-        <h2>Facets (<a href="?q=">reset</a>)</h2>
+        <h2>Facets (<a href="?q={{form.fields.q.data}}">reset</a>)</h2>
         <hr>
-        {% for fclass, values, applied in facets %}
-        {% if values %}
+        {% for fclass, fvalues in facets %}
+        {% if fvalues %}
         <ul class="facetclass">
-            {% for value in values %}
+            {% for facet in fvalues %}
             <li class="facetvalue">
-            {% with fclass|facet_param:value.term as param %}
-            {% if value.term in applied %}
-            <input type="hidden" name="{{fclass.param}}" value="{{value.term}}"/>
+            {% if facet.applied %}
+            <input type="hidden" name="{{fclass.param}}" value="{{facet.value}}"/>
             <span class="selected-filter">
-                {{fclass|facet_render:value.term}}<a class="remove-filter"
-                    href="{{request.get_full_path|removeparam:param|stripparam:"page,sort"}}">
+                {{facet.render}} <a class="remove-filter"
+                    href="{{request.get_full_path|removeparam:facet.as_param_kv|stripparam:"page,sort"}}">
                     <i class="icon-remove"></i>
                 </a>
             </span>
             {% else %}
-            <a href="{{request.get_full_path|addparam:param|stripparam:"page,sort"}}">
-                {{fclass|facet_render:value.term}}
-                ({{value.count}})
+            <a href="{{request.get_full_path|addparam:facet.as_param_kv|stripparam:"page,sort"}}">
+                {{facet.render}}
+                ({{facet.count}})
             </a>
             {% endif %}
-
-            {% endwith %}
             </li>
             {% endfor %}
         </ul>

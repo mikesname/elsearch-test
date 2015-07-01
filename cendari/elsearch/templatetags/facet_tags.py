@@ -16,14 +16,6 @@ def quote_plus(string):
     return urlquote_plus(string)
 
 @register.filter
-def facet_render(fclass, value):
-    return fclass.render(value)
-
-@register.filter
-def facet_param(fclass, value):
-    return fclass.format_param(value)
-
-@register.filter
 def format_param_kv(key, value):
     return "%s=%s" % (key, value) # TODO encode?
 
