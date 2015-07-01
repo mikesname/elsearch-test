@@ -40,6 +40,8 @@ FACETS = [
     FacetClass("lang", "languages", language_name_from_code)
 ]
 
+INDEX = "xmlfacets"
+
 
 def get_facets(request, search):
     """Apply term facets and filtering to the search"""
@@ -83,15 +85,13 @@ def search(request):
     start = max(0, page - 1)
 
     client = Elasticsearch()
-    s = Search(using=client, index="xmlfacets")
+    s = Search(using=client, index=INDEX)
     if query:
         s = s.query("match", text=query)
     s = s[start:start+20]
     s = get_facets(request, s)
-    print(s.to_dict())
     r = s.execute()
 
-    print("Facets: %s" % r.facets.to_dict())
     facets = parse_facets(request, r.facets)
     paginator = SearchPaginator(r.hits)
     try:
@@ -101,7 +101,11 @@ def search(request):
     except EmptyPage:
         docs = paginator.page(paginator.num_pages)
     context = dict(page=docs)
-    return render(request, "elsearch/document_list.html", dict(page=docs, form=form, facets=facets))
+    return render(request, "elsearch/document_list.html", dict(
+        page=docs,
+        form=form,
+        facets=facets
+    ))
 
 
 def document(request, doc_id):
