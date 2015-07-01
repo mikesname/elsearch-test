@@ -121,21 +121,26 @@ $('.facetview_filtershow').bind('click',showfiltervals);
 
     <div class="container">
         <div class="mainpanel">
+            {% if page.paginator.num_pages > 1 %}
             <div class="pagination">
-                <span class="step-links">
-                    {% if page.has_previous %}
-                    <a href="?page={{ page.previous_page_number }}">previous</a>
-                    {% endif %}
-
-                    <span class="current">
-                        Page {{ page.number }} of {{ page.paginator.num_pages }}.
-                    </span>
-
-                    {% if page.has_next %}
-                    <a href="?page={{ page.next_page_number }}">next</a>
-                    {% endif %}
-                </span>
+                <ol>
+                    {% for r in page|pagination_range:3 %}
+                        {% for p in r %}
+                            {% if p == page.number %}
+                                <li class="disabled"><a>{{p}}</a></li>
+                            {% else %}
+                                {% with "page"|format_param_kv:p as param %}
+                                    <li><a href="{{request.get_full_path|stripparam:"page"|addparam:param}}">{{p}}</a></li>
+                                {% endwith %}
+                                {% if forloop.last and p != page.paginator.num_pages %}
+                                    <li class="disabled"><a>...</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </ol>
             </div>
+            {% endif %}
 
 
             <ol class="resultlist">

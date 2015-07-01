@@ -66,7 +66,7 @@ def pagination_range(page, lastpage, adjacents):
     elif lastpage < 7 + window:
         return [range(1, lastpage + 1)]
     elif lastpage > 5 + window and page < 1 + window:
-        return [range(1, 4 + window), range(lastpage - 1, lastpage)]
+        return [range(1, 4 + window), range(lastpage - 1, lastpage + 1)]
     elif lastpage - window > page and page > window:
         return [
                 range(1, 3),
