@@ -90,4 +90,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-DEFAULT_INDEX_TABLESPACE = "xmlfacets"
+DEFAULT_INDEX_TABLESPACE = "faceted-search"

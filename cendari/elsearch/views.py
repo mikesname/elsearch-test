@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.paginator import EmptyPage, PageNotAnInteger
+from django.conf import settings
 
 from models import Document, DocumentManager
 
@@ -73,7 +74,7 @@ def search(request):
     start = max(0, page - 1)
 
     client = Elasticsearch()
-    s = Search(using=client, index="xmlfacets")
+    s = Search(using=client, index=settings.DEFAULT_INDEX_TABLESPACE)
     if query:
         s = s.query("match", text=query)
     s = s[start:start+20]
@@ -96,7 +97,7 @@ def search(request):
 
 def document(request, doc_id):
     client = Elasticsearch()
-    doc = client.get(index="xmlfacets", id=doc_id)
+    doc = client.get(index=settings.DEFAULT_INDEX_TABLESPACE, id=doc_id)
     context = dict(document=doc)
     return render(request, "elsearch/document.html", context)
 
