@@ -24,6 +24,19 @@ class FacetClass(object):
     def format_param(self, value):
         return "%s=%s" % (self.param, value)
 
+class Facet(object):
+    def __init__(self, value, count, applied, fclass):
+        self.value = value
+        self.count = count
+        self.applied = applied
+        self.fclass = fclass
+
+    def as_param_kv(self):
+        return "%s=%s" % (self.fclass.param, self.value)
+
+    def render(self):
+        return self.fclass.render(self.value)
+
 FACETS = [
     FacetClass("lang", "languages", language_name_from_code)
 ]
@@ -51,15 +64,12 @@ def parse_facets(request, data):
         fdata = getattr(data, fclass.tag)
         if not fdata:            
             continue
-        applied = []
         terms =  fdata.get("terms")
         if terms:
             inreq = request.GET.getlist(fclass.param)
-            if inreq:
-                for value in terms:
-                    if value["term"] in inreq:
-                        applied.append(value["term"])
-        facets.append((fclass, terms, applied))
+            parsed_facets = [Facet(value["term"], value["count"], value["term"] in inreq, fclass)\
+                    for value in terms]
+            facets.append((fclass, parsed_facets))
     return facets
 
 
@@ -79,10 +89,8 @@ def search(request):
         s = s.query("match", text=query)
     s = s[start:start+20]
     s = get_facets(request, s)
-    print(s.to_dict())
     r = s.execute()
 
-    print("Facets: %s" % r.facets.to_dict())
     facets = parse_facets(request, r.facets)
     paginator = SearchPaginator(r.hits)
     try:
@@ -92,7 +100,11 @@ def search(request):
     except EmptyPage:
         docs = paginator.page(paginator.num_pages)
     context = dict(page=docs)
-    return render(request, "elsearch/document_list.html", dict(page=docs, form=form, facets=facets))
+    return render(request, "elsearch/document_list.html", dict(
+        page=docs,
+        form=form,
+        facets=facets
+    ))
 
 
 def document(request, doc_id):

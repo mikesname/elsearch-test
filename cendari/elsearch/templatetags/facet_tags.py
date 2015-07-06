@@ -16,12 +16,8 @@ def quote_plus(string):
     return urlquote_plus(string)
 
 @register.filter
-def facet_render(fclass, value):
-    return fclass.render(value)
-
-@register.filter
-def facet_param(fclass, value):
-    return fclass.format_param(value)
+def format_param_kv(key, value):
+    return "%s=%s" % (key, value) # TODO encode?
 
 @register.filter
 def addparam(url, param):
@@ -101,5 +97,9 @@ def getitem(value, key):
 def hasitem(value, key):
     """Checks if an item is in a dictionary-like object."""
     return value.get(key) is not None
+
+@register.filter
+def pagination_range(page, window=3):
+    return utils.pagination_range(page.number, page.paginator.num_pages, window)
 
 

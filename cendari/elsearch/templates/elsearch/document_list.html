@@ -83,30 +83,27 @@ var showfiltervals = function(event) {
     <div style="clear:both;" class="btn-toolbar" id="facetview_selectedfilters">
     </div>
     <div class="leftpanel facetpane">
-        <h2>Facets (<a href="?q=">reset</a>)</h2>
+        <h2>Facets (<a href="?q={{form.fields.q.data}}">reset</a>)</h2>
         <hr>
-        {% for fclass, values, applied in facets %}
-        {% if values %}
+        {% for fclass, fvalues in facets %}
+        {% if fvalues %}
         <ul class="facetclass">
-            {% for value in values %}
+            {% for facet in fvalues %}
             <li class="facetvalue">
-            {% with fclass|facet_param:value.term as param %}
-            {% if value.term in applied %}
-            <input type="hidden" name="{{fclass.param}}" value="{{value.term}}"/>
+            {% if facet.applied %}
+            <input type="hidden" name="{{fclass.param}}" value="{{facet.value}}"/>
             <span class="selected-filter">
-                {{fclass|facet_render:value.term}}<a class="remove-filter"
-                    href="{{request.get_full_path|removeparam:param|stripparam:"page,sort"}}">
+                {{facet.render}} <a class="remove-filter"
+                    href="{{request.get_full_path|removeparam:facet.as_param_kv|stripparam:"page,sort"}}">
                     <i class="icon-remove"></i>
                 </a>
             </span>
             {% else %}
-            <a href="{{request.get_full_path|addparam:param|stripparam:"page,sort"}}">
-                {{fclass|facet_render:value.term}}
-                ({{value.count}})
+            <a href="{{request.get_full_path|addparam:facet.as_param_kv|stripparam:"page,sort"}}">
+                {{facet.render}}
+                ({{facet.count}})
             </a>
             {% endif %}
-
-            {% endwith %}
             </li>
             {% endfor %}
         </ul>
@@ -121,21 +118,26 @@ $('.facetview_filtershow').bind('click',showfiltervals);
 
     <div class="container">
         <div class="mainpanel">
+            {% if page.paginator.num_pages > 1 %}
             <div class="pagination">
-                <span class="step-links">
-                    {% if page.has_previous %}
-                    <a href="?page={{ page.previous_page_number }}">previous</a>
-                    {% endif %}
-
-                    <span class="current">
-                        Page {{ page.number }} of {{ page.paginator.num_pages }}.
-                    </span>
-
-                    {% if page.has_next %}
-                    <a href="?page={{ page.next_page_number }}">next</a>
-                    {% endif %}
-                </span>
+                <ol>
+                    {% for r in page|pagination_range:3 %}
+                        {% for p in r %}
+                            {% if p == page.number %}
+                                <li class="disabled"><a>{{p}}</a></li>
+                            {% else %}
+                                {% with "page"|format_param_kv:p as param %}
+                                    <li><a href="{{request.get_full_path|stripparam:"page"|addparam:param}}">{{p}}</a></li>
+                                {% endwith %}
+                                {% if forloop.last and p != page.paginator.num_pages %}
+                                    <li class="disabled"><a>...</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </ol>
             </div>
+            {% endif %}
 
 
             <ol class="resultlist">
