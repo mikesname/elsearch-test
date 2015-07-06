@@ -21,7 +21,7 @@ class Command(BaseCommand):
     xmlpaths = dict(
         id = "eag:eagheader/eag:eagid",
         name = "eag:archguide/eag:identity/eag:autform",
-        language = "eag:eagheader/eag:languagedecl/eag:language/@langcode"
+        languages = "eag:eagheader/eag:languagedecl/eag:language/@langcode"
     )
 
     option_list = BaseCommand.option_list + (
@@ -37,15 +37,17 @@ class Command(BaseCommand):
                     default=settings.DEFAULT_INDEX_TABLESPACE,
                     help='the elasticsearch index to import into'),
         
-        make_option('-f',
-                    '--force-update',
+        make_option('--delete-index',
                     action='store_true',
-                    default=False,
-                    help='update documents whether or not they have changed'),
+                    default=settings.DEFAULT_INDEX_TABLESPACE,
+                    help='drop the index prior to importing',
+                    dest="delete"),
     )
     def handle(self, *filepaths, **options):
         self.es = Elasticsearch("localhost:" + options["port"])
         self.es.indices.create(index=options["index"], ignore=400)
+        if options["delete"]:
+            self.es.indices.delete(index=options["index"])
         for filepath in filepaths:
             try:
                 self.parse_file(filepath, options)
