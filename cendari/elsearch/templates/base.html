@@ -4,13 +4,17 @@
     {% load staticfiles %}
 
     <title>Cendari Facetted Search</title>
-    <link rel="shortcut icon" href="/favicon.ico?v=2"/>
     <style type="text/css" href="{% static "css/base.css" %}"></style>
     {% block css %}{% endblock %}
     {% block js %}{% endblock %}
   </head>
   <body>
-      <H1><a href="{% url "document_list" %}"><img src="{%static "img/cendari_logo.png" %}"alt="Cendari logo"/></a>Cendari Faceted Search</h1>
+      <h1>
+          <a href="{% url "document_list" %}">
+              <img src="{%static "img/cendari_logo.png" %}"alt="Cendari logo"/>
+          </a>
+          Cendari Faceted Search
+      </h1>
     {% block content %}{% endblock %}
   </body>
 </html>

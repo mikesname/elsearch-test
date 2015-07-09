@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load staticfiles %}
+{% load display %}
 
 {% block css %}
     <style type="text/css">
@@ -27,28 +28,16 @@
   </p>
 </form>
 
-    <h2>XML Document (<a href="FIXME">Download</a>)</p>
-</h2>
+<h2>{{ document.name }} (<a href="{% url "download" document.id %}">Download</a>)</h2>
     <hr/>
-
-    <table>
-      <tr>
-	<td><label>filename:</label></td>
-	<td><span class="value">{{ document.filename }}</span></td>
-      </tr>
-      <tr>
-	<td><label>creator:</label></td>
-	<td><span class="value">{{ document.creator }}</span></td>
-      </tr>
-      <tr>
-	<td><label>created:</label></td>
-	<td><span class="value">{{ document.created }}</span></td>
-      </tr>
-      </table>
-
+    <dl>
+	    <dt>filename:</dt><dd>{{ document.filename }}</dd>
+        <dt>created:</dt><dd>{{ document.created }}</dd>
+    </dl>
+    <textarea id="document-xml" class="value" cols="80" rows="40" readonly="true">{{ document.contents|as_xml }}</textarea>
 <script>
       var editor = CodeMirror.fromTextArea(
-	  document.getElementById("document"),
+	  document.getElementById("document-xml"),
 	  { mode: "xml", readOnly: true });
 </script>
 {% endblock %}

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import transaction
 from lxml import etree
 from os import path
+from datetime import datetime
 from optparse import make_option
 from elasticsearch import Elasticsearch
 
@@ -19,9 +20,18 @@ class Command(BaseCommand):
     )
 
     xmlpaths = dict(
-        id = "eag:eagheader/eag:eagid",
-        name = "eag:archguide/eag:identity/eag:autform",
-        languages = "eag:eagheader/eag:languagedecl/eag:language/@langcode"
+        id = [
+            "eag:eagheader/eag:eagid",
+            "archdesc/did/unitid"
+        ],
+        name = [
+            "eag:archguide/eag:identity/eag:autform",
+            "archdesc/did/unittitle"
+            ],
+        languages = [
+            "eag:eagheader/eag:languagedecl/eag:language/@langcode",
+            "eadheader/profiledesc/langusage/language/@langcode"
+        ]
     )
 
     option_list = BaseCommand.option_list + (
@@ -70,6 +80,7 @@ class Command(BaseCommand):
         data = dict(
                 filename = filename,
                 contents = contents,
+                created = datetime.now()
         )
 
         def get_path_value(path):
@@ -83,13 +94,15 @@ class Command(BaseCommand):
                 pass
 
 
-        for key, path in self.xmlpaths.items():
-            value = get_path_value(path)
-            if value is not None:
-                data[key] = value        
+        for key, paths in self.xmlpaths.items():
+            for path in paths:
+                value = get_path_value(path)
+                if value is not None:
+                    data[key] = value        
+                    break
         
         if data.get("id") is None:
-            raise "Unable to find id for file: %s" % filename
+            raise ValueError("Unable to find id for file: %s" % filename)
 
         self.es.index(index=options["index"], doc_type="document", id=data["id"], body=data)
         print("Indexed: %s" % filename)

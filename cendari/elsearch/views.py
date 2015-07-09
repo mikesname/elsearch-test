@@ -110,6 +110,17 @@ def search(request):
 def document(request, doc_id):
     client = Elasticsearch()
     doc = client.get(index=settings.DEFAULT_INDEX_TABLESPACE, id=doc_id)
-    context = dict(document=doc)
+    context = dict(document=doc["_source"])
     return render(request, "elsearch/document.html", context)
+
+
+def download(request, doc_id):
+    client = Elasticsearch()
+    doc = client.get(index=settings.DEFAULT_INDEX_TABLESPACE, id=doc_id)
+    filename = doc["_source"]["filename"].rsplit("/")[-1]
+    contents = doc["_source"]["contents"]
+    response = HttpResponse(content_type='text/xml')
+    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+    response.write(contents)
+    return response
 

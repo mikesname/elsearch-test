@@ -3,6 +3,7 @@ import types
 
 from django.template import Library
 from django.utils.http import urlquote_plus
+from django.utils.html import mark_safe
 from django.conf import settings
 from django.forms import BaseForm
 
@@ -102,4 +103,7 @@ def hasitem(value, key):
 def pagination_range(page, window=3):
     return utils.pagination_range(page.number, page.paginator.num_pages, window)
 
+@register.filter
+def as_xml(data):
+    return mark_safe(data)
 
